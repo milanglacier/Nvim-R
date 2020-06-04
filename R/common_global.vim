@@ -3638,6 +3638,7 @@ function OnCompleteDone()
     call CloseFloatWin()
 endfunction
 
+let s:user_data = {}
 function StartFloatWin()
     if ! pumvisible()
         return
