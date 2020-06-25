@@ -778,7 +778,8 @@ static char *nvimcom_glbnv_line(SEXP *x, const char *xname, const char *curenv, 
                                 p = nvimcom_strcat(p, "\"\n");
                             } else {
                                 PROTECT(elmt = R_tryEval(VECTOR_ELT(cmdexpr2, 0), R_GlobalEnv, &er));
-                                p = nvimcom_glbnv_line(&elmt, ename, newenv, p);
+                                if(!er)
+                                    p = nvimcom_glbnv_line(&elmt, ename, newenv, p);
                                 UNPROTECT(1);
                             }
                             UNPROTECT(2);
