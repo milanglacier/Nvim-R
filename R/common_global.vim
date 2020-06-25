@@ -646,9 +646,6 @@ function CheckNvimcomVersion()
                 else
                     call ShowRSysLog(g:rplugin.debug_info['CMD_INSTALL'], "Error_installing_nvimcom", "Failed to install nvimcom")
                 endif
-                if has("win32")
-                    call CheckRtools()
-                endif
                 call delete("nvimcom_" . s:required_nvimcom . ".tar.gz")
                 return 0
             else
