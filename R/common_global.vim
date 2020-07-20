@@ -1244,6 +1244,9 @@ endif
 
 let s:func_offset = -2
 function StopRDebugging()
+    if !g:R_debug
+        return
+    endif
     "call sign_unplace('rdebugcurline')
     "sign unplace rdebugcurline
     sign unplace 1
@@ -1305,6 +1308,9 @@ function FindDebugFunc(srcref)
 endfunction
 
 function RDebugJump(fnm, lnum)
+    if !g:R_debug
+        return
+    endif
     if a:fnm == '' || a:fnm == '<text>'
         " Functions sent directly to R Console have no associated source file
         " and functions sourced by knitr have '<text>' as source reference.
@@ -4117,6 +4123,7 @@ let g:R_applescript       = get(g:, "R_applescript",        0)
 let g:R_esc_term          = get(g:, "R_esc_term",           1)
 let g:R_close_term        = get(g:, "R_close_term",         1)
 let g:R_buffer_opts       = get(g:, "R_buffer_opts", "winfixwidth nobuflisted")
+let g:R_debug             = get(g:, "R_debug",              1)
 let g:R_wait              = get(g:, "R_wait",              60)
 let g:R_wait_reply        = get(g:, "R_wait_reply",         2)
 let g:R_show_arg_help     = get(g:, "R_show_arg_help",      1)

@@ -1058,6 +1058,7 @@ of
 |R_nvimcom_home|      Mount point of remote R library
 |Nvim-R-df-view|      Options for visualizing a data.frame or matrix
 |Nvim-R-SyncTeX|      Options for SyncTeX
+|R_debug|             Support for debugging functions
 
 
 ------------------------------------------------------------------------------
@@ -2412,6 +2413,17 @@ field Source editor:
    Edit
    Settings
    Source editor: nclientserver %1 %2
+<
+
+------------------------------------------------------------------------------
+								     *R_debug*
+6.39 Support for debugging R functions~
+
+Put the line below in your |vimrc| if do not want that the cursor jumps to the
+line being debugged when by `browser()`. Highlighting of the line being
+debugged will also be disabled.
+>
+   let R_debug = 0
 <
 
 ==============================================================================
