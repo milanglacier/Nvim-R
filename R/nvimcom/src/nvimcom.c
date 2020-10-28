@@ -225,6 +225,7 @@ static void nvimcom_nvimclient(const char *msg, char *port)
         objbr_auto = 0;
         return;
     }
+    close(s);
 }
 #endif
 

@@ -307,6 +307,7 @@ static void SendToServer(const char *port, const char *msg)
         fflush(stderr);
         return;
     }
+    close(s);
 }
 #endif
 
