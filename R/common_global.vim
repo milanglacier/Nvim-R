@@ -535,6 +535,9 @@ function ShowRSysLog(slog, fname, msg)
 endfunction
 
 function RSetDefaultPkg()
+    if !exists('s:r_default_pkgs')
+        let s:r_default_pkgs  = $R_DEFAULT_PACKAGES
+    endif
     if $R_DEFAULT_PACKAGES == ""
         let $R_DEFAULT_PACKAGES = "datasets,utils,grDevices,graphics,stats,methods,nvimcom"
     elseif $R_DEFAULT_PACKAGES !~ "nvimcom"
@@ -830,10 +833,12 @@ function FinishStartingR()
         call AddForDeletion(g:rplugin.tmpdir . "/run_cmd.bat")
     endif
 
+
+    let start_options = ['Sys.setenv("R_DEFAULT_PACKAGES" = "' . s:r_default_pkgs . '")']
     if g:R_objbr_opendf
-        let start_options = ['options(nvimcom.opendf = TRUE)']
+        let start_options += ['options(nvimcom.opendf = TRUE)']
     else
-        let start_options = ['options(nvimcom.opendf = FALSE)']
+        let start_options += ['options(nvimcom.opendf = FALSE)']
     endif
     if g:R_objbr_openlist
         let start_options += ['options(nvimcom.openlist = TRUE)']
