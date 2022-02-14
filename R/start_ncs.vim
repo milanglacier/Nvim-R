@@ -75,7 +75,7 @@ function CheckNvimcomVersion()
                     \ '    sep = "\n")',
                     \ 'sink()' ]
         call writefile(rcode, g:rplugin.tmpdir . '/nvimcom_path.R')
-        let g:rplugin.debug_info['.libPaths()'] = system(g:rplugin.Rcmd . ' --no-restore --no-save --slave -f "' . g:rplugin.tmpdir . '/nvimcom_path.R"')
+        let g:rplugin.debug_info['.libPaths()'] = system(g:rplugin.Rcmd . ' --no-restore --no-save   -f "' . g:rplugin.tmpdir . '/nvimcom_path.R"')
         if v:shell_error
             call RWarningMsg(g:rplugin.debug_info['.libPaths()'])
             if has("win32")
@@ -119,7 +119,7 @@ function CheckNvimcomVersion()
             let cmds += [g:rplugin.Rcmd . " CMD INSTALL --no-lock nvimcom_" . s:required_nvimcom . ".tar.gz"]
         endif
         let cmds += ["rm nvimcom_" . s:required_nvimcom . ".tar.gz",
-                    \ g:rplugin.Rcmd . ' --no-restore --no-save --slave -e "' .
+                    \ g:rplugin.Rcmd . ' --no-restore --no-save   -e "' .
                     \ "cat(installed.packages()['nvimcom', c('Version', 'LibPath', 'Built')], sep = '\\n', file = '" . cmpldir . "/nvimcom_info')" . '"']
 
         call writefile(cmds, g:rplugin.tmpdir . '/' .  scrptnm)

@@ -237,7 +237,7 @@ Finally, run the command `:RDebugInfo` after <LocalLeader>rf and check the
 path where nvimcom was installed.
 
 On Windows, nvimcom compilation will fail if your `.Rprofile` outputs anything
-during R Startup. It will also fail with a message about `--slave` not being a
+during R Startup. It will also fail with a message about ` ` not being a
 `gcc` option if either `make.exe` or `gcc.exe` from RTools40 are not the first
 ones found in your systems's `PATH` (see |R_path| and |Rtools-path|).
 
