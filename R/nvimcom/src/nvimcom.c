@@ -35,6 +35,7 @@
 #define R_INTERFACE_PTRS 1
 extern int (*ptr_R_ReadConsole)(const char *, unsigned char *, int, int);
 static int (*save_ptr_R_ReadConsole)(const char *, unsigned char *, int, int);
+static int debug_r;
 static int debugging;
 LibExtern SEXP  R_SrcfileSymbol; // Defn.h
 static void SrcrefInfo();
@@ -259,10 +260,10 @@ static void nvimcom_nvimclient(const char *msg, char *port)
 }
 #endif
 
-static void nvimcom_squo(const char *buf, char *buf2)
+static void nvimcom_squo(const char *buf, char *buf2, int bsize)
 {
     int i = 0, j = 0;
-    while(j < 80){
+    while(j < bsize){
         if(buf[i] == '\''){
             buf2[j] = '\'';
             j++;
@@ -640,7 +641,7 @@ static void nvimcom_eval_expr(const char *buf)
     PROTECT(cmdexpr = R_ParseVector(cmdSexp, -1, &status, R_NilValue));
 
     char buf2[80];
-    nvimcom_squo(buf, buf2);
+    nvimcom_squo(buf, buf2, 80);
     if (status != PARSE_OK && verbose > 1) {
         strcpy(rep, "RWarningMsg('Invalid command: ");
         strncat(rep, buf2, 80);
@@ -821,10 +822,15 @@ static void SrcrefInfo()
         if (TYPEOF(srcfile) == ENVSXP) {
             SEXP filename = findVar(install("filename"), srcfile);
             if (isString(filename) && length(filename)) {
-                char buf[128];
-                snprintf(buf, 127, "RDebugJump('%s', %d)",
-                        CHAR(STRING_ELT(filename, 0)), asInteger(R_Srcref));
+                size_t slen = strlen(CHAR(STRING_ELT(filename, 0)));
+                char *buf = calloc(sizeof(char), (2 * slen + 32));
+                char *buf2 = calloc(sizeof(char), (2 * slen + 32));
+                snprintf(buf, 2 * slen + 1, "%s", CHAR(STRING_ELT(filename, 0)));
+                nvimcom_squo(buf, buf2, 2 * slen + 32);
+                snprintf(buf, 2 * slen + 31, "RDebugJump('%s', %d)", buf2, asInteger(R_Srcref));
                 nvimcom_nvimclient(buf, edsrvr);
+                free(buf);
+                free(buf2);
             }
         }
     }
@@ -1137,12 +1143,13 @@ static void nvimcom_server_thread(void *arg)
 #endif
 
 
-void nvimcom_Start(int *vrb, int *anm, int *swd, int *age, char **vcv, char **pth, char **rinfo)
+void nvimcom_Start(int *vrb, int *anm, int *swd, int *age, int *dbg, char **vcv, char **pth, char **rinfo)
 {
     verbose = *vrb;
     allnames = *anm;
     setwidth = *swd;
     autoglbenv = *age;
+    debug_r = *dbg;
 
     R_PID = getpid();
     strncpy(nvimcom_version, *vcv, 31);
@@ -1209,8 +1216,10 @@ void nvimcom_Start(int *vrb, int *anm, int *swd, int *age, char **vcv, char **pt
 #ifdef WIN32
         r_is_busy = 0;
 #else
-        save_ptr_R_ReadConsole = ptr_R_ReadConsole;
-        ptr_R_ReadConsole = nvimcom_read_console;
+        if (debug_r) {
+            save_ptr_R_ReadConsole = ptr_R_ReadConsole;
+            ptr_R_ReadConsole = nvimcom_read_console;
+        }
 #endif
 
     }
@@ -1232,7 +1241,8 @@ void nvimcom_Stop()
         closesocket(sfd);
         WSACleanup();
 #else
-        ptr_R_ReadConsole = save_ptr_R_ReadConsole;
+        if (debug_r)
+            ptr_R_ReadConsole = save_ptr_R_ReadConsole;
         close(sfd);
         nvimcom_nvimclient("STOP >>> Now <<< !!!", myport);
         pthread_join(tid, NULL);
